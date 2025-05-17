@@ -27,7 +27,7 @@ app.get('/exercises', async (req, res) => {
 // todo: build rest of query
     const {data, error} = await query
     if (error) {
-        console.error("Supabse error:", error)
+        console.error("Supabase error:", error)
         return res.status(500).json({ error: error.message })
     }
     console.log(data)
