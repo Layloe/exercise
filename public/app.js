@@ -24,6 +24,8 @@ document.getElementById('filterForm').addEventListener('submit', async e => {
                 return `<li>${exercises.name}</li>`
             }).join('')
         }
+        
+        console.log(exercises.level)
 
     } catch (err) {
         console.error('Error fetching exercises:', err)
