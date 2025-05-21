@@ -20,12 +20,22 @@ document.getElementById('filterForm').addEventListener('submit', async e => {
         if (exercises.length === 0) {
             ul.innerHTML = '<li>No exercises found.</li>'
         } else {
-            ul.innerHTML = exercises.map(exercises => {
-                return `<li>${exercises.name}</li>`
+            ul.innerHTML = exercises.map(exercise => {
+                return `
+                <li>
+                <a href="exercise.html?id=${encodeURIComponent(exercise.id)}" target="_blank">
+                <strong>${exercise.level}</strong><br/>
+                </a>
+                <strong>${exercise.name}<strong/><br/>
+                Level: ${exercise.level},
+                Equipment: ${exercise.equipment ? exercise.equipment : 'None'},
+                Primary Muscle: ${exercise.primaryMuscles},
+                Category: ${exercise.category}
+                </li>`
             }).join('')
         }
-        
-        console.log(exercises.level)
+         
+        // console.log(exercises.level)
 
     } catch (err) {
         console.error('Error fetching exercises:', err)

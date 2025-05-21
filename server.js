@@ -18,16 +18,16 @@ app.use(express.static('public'))
 // Call to fetch exercises from DB
 app.get('/exercises', async (req, res) => {
 
-    const{level = [], equipment = [], primaryMuscles = [], category = []} = req.query
-    
-    const levels = Array.isArray(level ? level : [level])
-    const equips = Array.isArray(equipment ? equipment : [equipment])
-    const muscles = Array.isArray(primaryMuscles ? primaryMuscles : [primaryMuscles])
-    const cats = Array.isArray(category ? category : [category])
+    const { level = [], equipment = [], primaryMuscles = [], category = [] } = req.query
+
+    const levels = Array.isArray(level) ? level : [level]
+    const equips = Array.isArray(equipment) ? equipment : [equipment]
+    const muscles = Array.isArray(primaryMuscles) ? primaryMuscles : [primaryMuscles]
+    const cats = Array.isArray(category) ? category : [category]
 
     // select name from exercises
     let query = supabase.from('exercises')
-    .select('id, name, level, equipment, primaryMuscles, category') // selecting the ID to store it in the anchor tag
+        .select('id, name, level, equipment, primaryMuscles, category') // selecting the ID to store it in the anchor tag
 
     //"where level in (<levels>)"
     //select name from exercises where level in ('Beginner', 'Intermediate')
@@ -44,7 +44,7 @@ app.get('/exercises', async (req, res) => {
         query = query.neq('equipment', 'Body Only')
     }
     // If not none and not all muscles selected, then "where primaryMuscles in (<muscles>)"
-    if (muscles.length > 0 && muscles.length < 17 ) {
+    if (muscles.length > 0 && muscles.length < 17) {
         query = query.in('primaryMuscles', muscles)
     }
     // If not none and not all categories selected, then "where category in (<categories>)"
@@ -53,14 +53,32 @@ app.get('/exercises', async (req, res) => {
     }
 
     // Execute query and await result
-    const {data, error} = await query
+    const { data, error } = await query
     if (error) {
         console.error("Supabase error:", error)
         return res.status(500).json({ error: error.message })
     }
-    // console.log(data)
+    console.log(data)
 
     res.json(data)
+
+})
+
+//Fetch as single exercises base ib its ID (passed from frontend)
+app.get('/exercises/:id', async (req, res) => {
+
+    const { id } = req.params
+
+    const { data, error } = await supabase
+        .from('exercises')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+    if (error) {
+        console.error('Error fetching exercise:', error)
+        return res.status(500).json({ error: error.message })
+    }
 })
 
 app.listen(PORT, () => {
