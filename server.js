@@ -79,6 +79,8 @@ app.get('/exercises/:id', async (req, res) => {
         console.error('Error fetching exercise:', error)
         return res.status(500).json({ error: error.message })
     }
+
+    res.json(data)
 })
 
 app.listen(PORT, () => {
