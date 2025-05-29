@@ -8,38 +8,41 @@ document.getElementById('filterForm').addEventListener('submit', async e => {
         params.append(key, value)
     })
 
-    //console.log(params.toString())
-
     try {
         const res = await fetch('/exercises?' + params.toString())
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const exercises = await res.json() // format response as JSON
 
         // Set up list elements inside ul tag
-        const ul = document.getElementById('results')
+        const container = document.getElementById('results')
         if (exercises.length === 0) {
-            ul.innerHTML = '<li>No exercises found.</li>'
+            container.innerHTML = '<p>No exercises found.</p>'
         } else {
-            ul.innerHTML = exercises.map(exercise => {
-                return `
-                <li>
-                <a href="exercise.html?id=${encodeURIComponent(exercise.id)}" target="_blank">
+            container.innerHTML = exercises.map(exercise => `
+                <div class="col-mb-4">
+                <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                <a href="exercise.html?id=${encodeURIComponent(exercise.id)}" target="_blank"
+                class="text-decoration-none mb-3">
+                <h5 class="card-title">${exercise.name}</h5>
                 <strong>${exercise.level}</strong><br/>
                 </a>
-                <strong>${exercise.name}<strong/><br/>
-                Level: ${exercise.level},
-                Equipment: ${exercise.equipment ? exercise.equipment : 'None'},
-                Primary Muscle: ${exercise.primaryMuscles},
-                Category: ${exercise.category}
-                </li>`
-            }).join('')
-        }
-         
-        // console.log(exercises.level)
 
+                <!-- Wrap all the details here and push them down -->
+                <div class="mt-auto">
+                <p class="card-text mb-1"><strong>Level:</strong> ${exercise.level}</p>
+                <p class="card-text mb-1"><strong>Equipment:</strong> ${exercise.equipment}</p>
+                <p class="card-text mb-1"><strong>Primary Muscle:</strong> ${exercise.primaryMuscles}</p>
+                <p class="card-text"><strong>Category:</strong> ${exercise.category}</p>
+                </div>
+                </div>
+                </div>
+                </div>
+            `).join('')
+        }
     } catch (err) {
         console.error('Error fetching exercises:', err)
         document.getElementById('results').innerHTML =
-            '<li style="color:red">Failed to load exercises.</li>'
+            '<p class="text-danger">Failed to load exercises.</p>'
     }
 })
