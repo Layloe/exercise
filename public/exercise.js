@@ -21,7 +21,7 @@
         // Secondary muscles are delimited with | symbols, replace with comma and space
         const secondary = ex.secondaryMuscle ? ex.secondaryMuscle.split('|').join(', ') : ""
         // Same with exercise steps
-        const steps = ex.secondaryMuscle ? ex.secondaryMuscle.split('|') : []
+        const steps = ex.instructions ? ex.instructions.split('|') : []
         // Construct image URLs so we don't have to host them ourself
         const base = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/'
         const img0 = ex.image0 ? `<img src="${base}${ex.image0}" alt="${ex.name} image 1" style="max-width:300px;margin-right:1rem;">` : ''
@@ -30,7 +30,7 @@
         // List other details 
         container.innerHTML = `
         <h1>${ex.name}</h1>
-        <p><strong>Force:</strong></p>
+        <p><strong>Force:</strong>${ex.force}</p>
         <p><strong>Level:</strong> ${ex.level}</p>
         <p><strong>Mechanic:</strong> ${ex.mechanic}</p>
         <p><strong>Equipment:</strong> ${ex.equipment}</p>
