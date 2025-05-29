@@ -3,13 +3,11 @@
 (async() => {
     // Get the encoded ID value from the clicked link
     const params = new URLSearchParams(window.location.search)
-
     const id = params.get('id')
-
     const container = document.getElementById('details')
 
     if(!id) {
-        container.textContent = 'No exercise specified'
+        container.querySelector('.card-body').textContent = 'No exercise specified'
         return
     }
     // Try to get the exercise details from the server
@@ -19,35 +17,67 @@
         const ex = await res.json()
 
         // Secondary muscles are delimited with | symbols, replace with comma and space
-        const secondary = ex.secondaryMuscle ? ex.secondaryMuscle.split('|').join(', ') : ""
+        const secondaryBadges = ex.secondaryMuscles  
+        .split('|')
+        .map(muscle => `<spam class="badge bg-secondary me-1">${muscle}</spam>`)
+        .join('') 
+
         // Same with exercise steps
-        const steps = ex.instructions ? ex.instructions.split('|') : []
-        // Construct image URLs so we don't have to host them ourself
+        // Instructions as a Bootstrap numbered list
+        const steps = ex.instructions.split('|') 
+        .map(step => `<li class="list-group-item>${step}</li>`)
+        .join('')
+
+        // Image URLs 
         const base = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/'
-        const img0 = ex.image0 ? `<img src="${base}${ex.image0}" alt="${ex.name} image 1" style="max-width:300px;margin-right:1rem;">` : ''
-        const img1 = ex.image1 ? `<img src="${base}${ex.image1}" alt="${ex.name} image 2" style="max-width:300px;">` : ''
+        const imgs = [ex.image0, ex.image1]
+        .filter(Boolean)
+        .map(src => `
+            <div class="col">
+              <img src="${base + src}"
+                alt=${ex.name}"
+                class="img-fluid rounded shadow-sm">
+            </div>
+        `).join('')
 
         // List other details 
         container.innerHTML = `
-        <h1>${ex.name}</h1>
-        <p><strong>Force:</strong>${ex.force}</p>
-        <p><strong>Level:</strong> ${ex.level}</p>
-        <p><strong>Mechanic:</strong> ${ex.mechanic}</p>
-        <p><strong>Equipment:</strong> ${ex.equipment}</p>
-        <p><strong>Primary Muscle:</strong> ${ex.primaryMuscles}</p>
-        <p><strong>Secondary Muscles:</strong> ${secondary}</p>
-        <p><strong>Category:</strong> ${ex.category}</p>
+        <div class="card-body">
+          <h2 class="card-title mb-3">${ex.name}</h2>
+          
+          <div class="row mb-4">
+          <div class="col-6 test-start">
+            <p><strong>Force:</strong>${ex.force}</p>
+            <p><strong>Level:</strong> ${ex.level}</p>
+            <p><strong>Mechanic:</strong> ${ex.mechanic}</p>
+            <p><strong>Equipment:</strong> ${ex.equipment}</p>
+          </div>
+          <div class="col-6 test-start">
+            <p><strong>Primary Muscle:</strong> 
+            <spam class="badge bg-primary">${ex.primaryMuscles}</spam>
+            </p>
+            <p><strong>Secondary Muscles:</strong> ${secondaryBadges}</p>
+            <p><strong>Category:</strong> 
+            <spam class="badge bg-info text-dark">${ex.category}</spam>
+            </p>
+          </div>
+        </div>
 
-        <h2>Instructions</h2>
+        <h5>Instructions</h5>
         <!-- Put exercise steps in an ordered list (with numbers) -->
-        <ol>
-            ${steps.map(step => `<li>${step}</li>`).join('')}
+        <ol class="list-group list-group-numbered mb-4">
+            ${steps}
         </ol>
 
-        <div>${img0}${img1}</div>
+        <h5>Images</h5>
+          <div class="row g-3">
+            ${imgs}
+          </div>
+        </div>
         `
     } catch (err) {
-        console.error(err)
-        container.textContent = 'Failed to load exercise details.'
-    }
+    console.error(err)
+    container.querySelector('.card-body').textContent =
+      'Failed to load exercise details.'
+  }
 })()
